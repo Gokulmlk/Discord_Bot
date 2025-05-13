@@ -6,11 +6,13 @@ from sqlalchemy import Column, DateTime, func
 from sqlalchemy.sql import func
 from datetime import datetime 
 
-class USer(SQLModel, table=True):
+load_dotenv()
+
+class User(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     created_at: datetime = Field(default_factory=datetime.utcnow)
     messages: List["Message"] = Relationship(back_populates="author")
-
+    name: str
 
 class Session(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
@@ -31,6 +33,9 @@ class Message(SQLModel,table = True):
 
     session_id: Optional[int] = Field(default=None, foreign_key="session.id")
     session: Optional[Session] = Relationship(back_populates="messages")
+
+    author_id: Optional[int] = Field(default=None, foreign_key="user.id")
+    author: Optional[User] = Relationship(back_populates="messages")  
 
 database_url = os.getenv("DATABASE_URL")
 engine = create_engine(database_url, echo=True)
